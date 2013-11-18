@@ -51,9 +51,11 @@ public class BTControlActivity extends Activity implements
 		Intent startStopService = new Intent(
 				ServiceNames.BLUETOOTH_CLIENT_SERVICE);
 		if (btv.getText().equals("stop Service")) {
+			
 			stopService(startStopService);
-			btv.setText("start Service");
 			messengerHelper.unregister(this);
+			btv.setText("start Service");
+			
 		} else {
 			startService(startStopService);
 			btv.setText("stop Service");
