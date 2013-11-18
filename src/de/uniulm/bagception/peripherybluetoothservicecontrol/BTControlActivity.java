@@ -1,16 +1,10 @@
 package de.uniulm.bagception.peripherybluetoothservicecontrol;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,22 +12,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
-import de.philipphock.android.lib.services.messenger.MessengerService;
 import de.philipphock.android.lib.services.observation.ConstantFactory;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
-import de.uniulm.bagception.bluetoothservermessengercommunication.MessengerConstants;
+import de.uniulm.bagception.peripherybluetoothservicecontrol.messenger.MessengerHelper;
+import de.uniulm.bagception.peripherybluetoothservicecontrol.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.services.ServiceNames;
 
 public class BTControlActivity extends Activity implements
-		ServiceObservationReactor {
+		ServiceObservationReactor, MessengerHelperCallback {
 
 	private ServiceObservationActor soActor;
 	private final Handler checkinstalledHandler = new Handler();
 
-	// communication with service
-	private Messenger serviceMessenger;
-	private boolean isConnectedWithService;
+	private MessengerHelper messengerHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +33,7 @@ public class BTControlActivity extends Activity implements
 		soActor = new ServiceObservationActor(this,
 				ServiceNames.BLUETOOTH_CLIENT_SERVICE);
 		setContentView(R.layout.activity_btcontrol);
+		messengerHelper = new MessengerHelper(this, ServiceNames.BLUETOOTH_CLIENT_SERVICE);
 	}
 
 	// @Override
@@ -60,9 +53,7 @@ public class BTControlActivity extends Activity implements
 		if (btv.getText().equals("stop Service")) {
 			stopService(startStopService);
 			btv.setText("start Service");
-			if(isConnectedWithService){
-				unbindService(sconn);
-			}
+			messengerHelper.unregister(this);
 		} else {
 			startService(startStopService);
 			btv.setText("stop Service");
@@ -89,24 +80,12 @@ public class BTControlActivity extends Activity implements
 		Bundle b = new Bundle();
 		b.putString("cmd", "msg");
 		b.putString("payload", toSend);
-		Message m = Message.obtain(null,
-				MessengerConstants.MESSAGE_BUNDLE_MESSAGE);
-		m.setData(b);
-		if (serviceMessenger==null){
-			onSendButNotConnectedWithService();
-			return;
-		}
-		try {
-			serviceMessenger.send(m);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		
+		messengerHelper.sendMessage(b);
 
 	}
 
-	private  void onSendButNotConnectedWithService(){
-		Toast.makeText(this, "tried to send text but not connected with service", Toast.LENGTH_SHORT).show();
-	}
+	
 	
 	//lifecycle methods
 	
@@ -127,10 +106,7 @@ public class BTControlActivity extends Activity implements
 		super.onPause();
 		soActor.unregister(this);
 		
-		if(isConnectedWithService){
-			unbindService(sconn);
-			isConnectedWithService=false;
-		}
+		messengerHelper.unregister(this);
 		
 	}
 
@@ -142,9 +118,7 @@ public class BTControlActivity extends Activity implements
 		status.setText("started");
 		status.setTextColor(Color.GREEN);
 		
-		Intent runningService = new Intent(
-				ServiceNames.BLUETOOTH_CLIENT_SERVICE);
-		bindService(runningService, sconn, 0);
+		messengerHelper.register(this);
 	}
 
 	@Override
@@ -156,80 +130,26 @@ public class BTControlActivity extends Activity implements
 		status.setTextColor(Color.RED);
 	}
 
-	// IPC using messenger
 
-	ServiceConnection sconn = new ServiceConnection() {
-
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			serviceMessenger = null;
-			isConnectedWithService = false;
+	
+	//MessengerHelperCallback
+	
+	@Override
+	public void onMessage(Bundle b) {
+		Log.d(getClass().getName(), "handle "
+				+ b.toString());
+		for (String key : b.keySet()) {
+			LOG.out(key, b.get(key));
 		}
+		Toast.makeText(BTControlActivity.this,
+				b.toString(), Toast.LENGTH_SHORT).show();
+				
+	}
 
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			serviceMessenger = new Messenger(service);
-			isConnectedWithService = true;
-
-			// We want to monitor the service for as long as we are
-			// connected to it.
-			try {
-				Message msg = Message.obtain(null,
-						MessengerService.MSG_REGISTER_CLIENT);
-				msg.replyTo = incomingMessenger;
-				serviceMessenger.send(msg);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
-	};
-
-	// ###### IPC ######\\
-	private final Handler incomingHandler = new Handler(new Handler.Callback() {
-
-		// Handles incoming messages
-		@Override
-		public boolean handleMessage(Message msg) {
-			switch (msg.what) {
-			case MessengerConstants.MESSAGE_BUNDLE_MESSAGE:
-				Log.d(getClass().getName(), "handle "
-						+ msg.getData().toString());
-				for (String key : msg.getData().keySet()) {
-					LOG.out(key, msg.getData().get(key));
-				}
-				Toast.makeText(BTControlActivity.this,
-						msg.getData().toString(), Toast.LENGTH_SHORT).show();
-
-				break;
-			}
-			return false;
-		}
-	});
-
-	// delivered to the server, handles incoming messages
-	private final Messenger incomingMessenger = new Messenger(incomingHandler);
-
-	public void doUnbindService() {
-		if (isConnectedWithService) {
-			// If we have received the service, and hence registered with
-			// it, then now is the time to unregister.
-			if (serviceMessenger != null) {
-				try {
-					Message msg = Message.obtain(null,
-							MessengerService.MSG_UNREGISTER_CLIENT);
-					msg.replyTo = incomingMessenger;
-					serviceMessenger.send(msg);
-				} catch (RemoteException e) {
-					// There is nothing special we need to do if the service
-					// has crashed.
-				}
-			}
-
-			// Detach our existing connection.
-			unbindService(sconn);
-			isConnectedWithService = false;
-
-		}
+	@Override
+	public void onError(Exception e) {
+		e.printStackTrace();
+		
 	}
 
 }
