@@ -15,8 +15,8 @@ import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.observation.ConstantFactory;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
-import de.uniulm.bagception.peripherybluetoothservicecontrol.messenger.MessengerHelper;
-import de.uniulm.bagception.peripherybluetoothservicecontrol.messenger.MessengerHelperCallback;
+import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelper;
+import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.services.ServiceNames;
 
 public class BTControlActivity extends Activity implements
