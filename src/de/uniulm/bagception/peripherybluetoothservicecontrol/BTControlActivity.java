@@ -81,10 +81,18 @@ public class BTControlActivity extends Activity implements
 		b.putString("cmd", "msg");
 		b.putString("payload", toSend);
 		
-		messengerHelper.sendMessage(b);
+		messengerHelper.sendBundle(b);
 
 	}
 
+	
+	public void onPingClicked(View v) {
+		Bundle b = new Bundle();
+		b.putString("cmd", "PING");
+		messengerHelper.sendBundle(b);
+
+
+	}
 	
 	
 	//lifecycle methods
