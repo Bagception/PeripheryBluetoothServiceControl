@@ -17,6 +17,7 @@ import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelper;
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
+import de.uniulm.bagception.protocol.bundle.constants.Commands;
 import de.uniulm.bagception.services.ServiceNames;
 
 public class BTControlActivity extends Activity implements
@@ -87,6 +88,13 @@ public class BTControlActivity extends Activity implements
 
 	}
 
+	public void onScanTriggerClicked(View v) {
+		Bundle b = new Bundle();
+		b.putString("cmd", Commands.TRIGGER_SCAN_DEVICES);
+		LOG.out(this, "SCAN BTN WORKS");
+		messengerHelper.sendMessageBundle(b);
+
+	}
 	
 	public void onPingClicked(View v) {
 		Bundle b = new Bundle();
@@ -146,8 +154,6 @@ public class BTControlActivity extends Activity implements
 	
 	@Override
 	public void onBundleMessage(Bundle b) {
-		Log.d(getClass().getName(), "handle "
-				+ b.toString());
 		for (String key : b.keySet()) {
 			LOG.out(key, b.get(key));
 		}
