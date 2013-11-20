@@ -83,7 +83,7 @@ public class BTControlActivity extends Activity implements
 		b.putString("cmd", "msg");
 		b.putString("payload", toSend);
 		
-		messengerHelper.sendBundle(b);
+		messengerHelper.sendMessageBundle(b);
 
 	}
 
@@ -91,7 +91,7 @@ public class BTControlActivity extends Activity implements
 	public void onPingClicked(View v) {
 		Bundle b = new Bundle();
 		b.putString("cmd", "PING");
-		messengerHelper.sendBundle(b);
+		messengerHelper.sendMessageBundle(b);
 
 
 	}
@@ -145,7 +145,7 @@ public class BTControlActivity extends Activity implements
 	//MessengerHelperCallback
 	
 	@Override
-	public void onMessage(Bundle b) {
+	public void onBundleMessage(Bundle b) {
 		Log.d(getClass().getName(), "handle "
 				+ b.toString());
 		for (String key : b.keySet()) {
@@ -159,6 +159,18 @@ public class BTControlActivity extends Activity implements
 	@Override
 	public void onError(Exception e) {
 		e.printStackTrace();
+		
+	}
+
+	@Override
+	public void onResponseMessage(Bundle b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusMessage(Bundle b) {
+		// TODO Auto-generated method stub
 		
 	}
 
