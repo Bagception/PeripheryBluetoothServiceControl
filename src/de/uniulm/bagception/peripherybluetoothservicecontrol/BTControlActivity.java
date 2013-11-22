@@ -168,19 +168,19 @@ public class BTControlActivity extends Activity implements
 
 	@Override
 	public void onResponseMessage(Bundle b) {
-		Response r = Response.getResponse(b);
-		switch (r) {
-		case Confirm_Established_Connection:
-			Toast.makeText(this, "establish?", Toast.LENGTH_SHORT).show();
-			Bundle answer = ResponseAnswer.getResponseAnswerBundle(ResponseAnswer.Confirm_Established_Connection);
-			answer.putBoolean(ResponseAnswer.EXTRA_KEYS.PAYLOAD, true);
-			messengerHelper.sendResponseBundle(answer);
-			
-			break;
-
-		default:
-			break;
-		}
+//		Response r = Response.getResponse(b);
+//		switch (r) {
+//		case Confirm_Established_Connection:
+//			Toast.makeText(this, "establish?", Toast.LENGTH_SHORT).show();
+//			Bundle answer = ResponseAnswer.getResponseAnswerBundle(ResponseAnswer.Confirm_Established_Connection);
+//			answer.putBoolean(ResponseAnswer.EXTRA_KEYS.PAYLOAD, true);
+//			messengerHelper.sendResponseBundle(answer);
+//			
+//			break;
+//
+//		default:
+//			break;
+//		}
 	}
 
 	@Override
