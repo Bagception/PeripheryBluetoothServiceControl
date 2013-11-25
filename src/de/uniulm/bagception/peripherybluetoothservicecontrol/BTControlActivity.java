@@ -282,6 +282,7 @@ public class BTControlActivity extends Activity implements
 
 	@Override
 	public void connectedWithRemoteService() {
+		//when we reconnect with the bluetoothMiddleware, we ask if the btclient is connected
 		messengerHelper.sendCommandBundle(Command.getCommandBundle(Command.RESEND_STATUS));
 	}
 
