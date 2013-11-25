@@ -155,7 +155,7 @@ public class BTControlActivity extends Activity implements
 		Intent broadcastRequest = new Intent();
 
 		//broadcast answer is handled by ServiceObservationReactor
-		//with this, we foce the BluetoothMiddleware to resent if it is alive
+		//with this, we force the BluetoothMiddleware to resent if it is alive
 		broadcastRequest
 				.setAction(ConstantFactory 
 						.getForceResendStatusString(ServiceNames.BLUETOOTH_CLIENT_SERVICE));  
