@@ -150,10 +150,11 @@ public class BTControlActivity extends Activity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
 		onServiceStopped(null); //here we pretend that the service has stopped. If it has getForceResendStatusString will have to effect and the service is stopped, if it has getForceResendStatusString will trigger onServiceStarted 
 		soActor.register(this);
 		Intent broadcastRequest = new Intent();
-
+		messengerHelper.register(this);
 		//broadcast answer is handled by ServiceObservationReactor
 		//with this, we force the BluetoothMiddleware to resent if it is alive
 		broadcastRequest
