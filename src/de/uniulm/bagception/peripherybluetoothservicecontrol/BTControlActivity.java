@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
+import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ConstantFactory;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
@@ -126,23 +128,43 @@ public class BTControlActivity extends Activity implements
 		EditText txt = (EditText) findViewById(R.id.message);
 		String toSend = txt.getText().toString();
 
-		Bundle b = new Bundle();
+		final Bundle b = new Bundle();
 		b.putString("cmd", "msg");
 		b.putString("payload", toSend);
 
+		//this is how we communicate with the service
 		messengerHelper.sendMessageSendBundle(b);
-
 	}
 
 	public void onScanTriggerClicked(View v) {
 		Bundle b = Command.getCommandBundle(Command.TRIGGER_SCAN_DEVICES);
 		LOG.out(this, "SCAN BTN CLICKED");
 		
-		//this is how we communicate with the service
-		messengerHelper.sendCommandBundle(b);
+		//this is how we communicate with the service if we want to send it after we hopefully stated the service
+		considerDelayedSending(b);
+		
 
 	}
 
+	
+	private void considerDelayedSending(final Bundle b){
+		
+		if (!ServiceUtil.isServiceRunning(this, ServiceNames.BLUETOOTH_CLIENT_SERVICE)){
+			startService(new Intent(ServiceNames.BLUETOOTH_CLIENT_SERVICE));
+			new Handler().postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+			
+					messengerHelper.sendCommandBundle(b);
+					
+				}
+			}, 300);
+		}else{
+			
+			messengerHelper.sendCommandBundle(b);
+		}
+	}
 	//A ping is used to check if the connection between BluetoothMiddleware and Activity works 
 	//A PING is sent, then a PONG is recv.
 	public void onPingClicked(View v) {
