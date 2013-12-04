@@ -1,5 +1,7 @@
 package de.uniulm.bagception.peripherybluetoothservicecontrol;
 
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,6 +21,9 @@ import de.philipphock.android.lib.services.observation.ServiceObservationReactor
 import de.uniulm.bagception.bluetoothclientmessengercommunication.actor.BundleMessageActor;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.actor.BundleMessageReactor;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.protocol.bundle.constants.Command;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
@@ -308,12 +313,34 @@ public class BTControlActivity extends Activity implements
 
 	@Override
 	public void onBundleMessageRecv(Bundle b) {
-		for (String key : b.keySet()) {
-			LOG.out(key, b.get(key));
-		}
-		Toast.makeText(BTControlActivity.this, b.toString(), Toast.LENGTH_SHORT)
+		LOG.out(this, b);
+		BUNDLE_MESSAGE msg = BundleMessage.getInstance().getBundleMessageType(b);
+		switch (msg){
+		case NOT_A_BUNDLE_MESSAGE:
+			Toast.makeText(BTControlActivity.this, "unknown action", Toast.LENGTH_SHORT)
+			.show();
+				for (String key : b.keySet()) {
+					LOG.out(key, b.get(key));
+				}
+				
+				Toast.makeText(BTControlActivity.this, b.toString(), Toast.LENGTH_SHORT)
+						.show();
+			break;
+			
+		case ITEM_FOUND:
+			Item i;
+			try {
+				i = BundleMessage.getInstance().toItemFound(b);
+				Toast.makeText(BTControlActivity.this, "item found: "+i.getName(), Toast.LENGTH_SHORT)
 				.show();
-
+			} catch (JSONException e) {
+				Toast.makeText(BTControlActivity.this, "error reading item", Toast.LENGTH_SHORT)
+				.show();
+			}
+			
+			break;
+			
+		}
 		//those messages come from the remote bluetooth device, not from the BluetoothMiddleware
 		
 	}
