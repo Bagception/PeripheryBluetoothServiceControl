@@ -265,8 +265,6 @@ public class BTControlActivity extends Activity implements
 		TextView v = (TextView) findViewById(R.id.ConnectionInfo);
 		switch (c) {
 		case CONNECTED:
-			Toast.makeText(BTControlActivity.this, "Connected to server",
-					Toast.LENGTH_SHORT).show();
 			
 			v.setText("connected");
 			v.setTextColor(Color.GREEN);
@@ -274,9 +272,7 @@ public class BTControlActivity extends Activity implements
 			break;
 
 		case DISCONNECTED:
-			Toast.makeText(BTControlActivity.this, "Disconnected from server",
-					Toast.LENGTH_SHORT).show();
-		
+			
 			v.setText("disconnected");
 			v.setTextColor(Color.RED);
 			break;
