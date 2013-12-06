@@ -324,10 +324,16 @@ public class BTControlActivity extends Activity implements
 			break;
 			
 		case ITEM_FOUND:
+		case ITEM_NOT_FOUND:
+			
 			Item i;
 			try {
 				i = BundleMessage.getInstance().toItemFound(b);
-				Toast.makeText(BTControlActivity.this, "item found: "+i.getName(), Toast.LENGTH_SHORT)
+				String itemMsgString = "item found: "+i.getName();
+				if (msg == BUNDLE_MESSAGE.ITEM_NOT_FOUND){
+					itemMsgString = "unknown tag: "+i.getIds().get(0);
+				}
+				Toast.makeText(BTControlActivity.this,itemMsgString , Toast.LENGTH_SHORT)
 				.show();
 			} catch (JSONException e) {
 				Toast.makeText(BTControlActivity.this, "error reading item", Toast.LENGTH_SHORT)
@@ -335,7 +341,9 @@ public class BTControlActivity extends Activity implements
 			}
 			
 			break;
+		
 			
+		
 		}
 		//those messages come from the remote bluetooth device, not from the BluetoothMiddleware
 		
