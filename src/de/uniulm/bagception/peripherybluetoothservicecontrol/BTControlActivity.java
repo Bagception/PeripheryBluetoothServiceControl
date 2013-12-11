@@ -309,43 +309,43 @@ public class BTControlActivity extends Activity implements
 
 	@Override
 	public void onBundleMessageRecv(Bundle b) {
-		LOG.out(this, b);
-		BUNDLE_MESSAGE msg = BundleMessage.getInstance().getBundleMessageType(b);
-		switch (msg){
-		case NOT_A_BUNDLE_MESSAGE:
-			Toast.makeText(BTControlActivity.this, "unknown action", Toast.LENGTH_SHORT)
-			.show();
-				for (String key : b.keySet()) {
-					LOG.out(key, b.get(key));
-				}
-				
-				Toast.makeText(BTControlActivity.this, b.toString(), Toast.LENGTH_SHORT)
-						.show();
-			break;
-			
-		case ITEM_FOUND:
-		case ITEM_NOT_FOUND:
-			
-			Item i;
-			try {
-				i = BundleMessage.getInstance().toItemFound(b);
-				String itemMsgString = "item found: "+i.getName();
-				if (msg == BUNDLE_MESSAGE.ITEM_NOT_FOUND){
-					itemMsgString = "unknown tag: "+i.getIds().get(0);
-				}
-				Toast.makeText(BTControlActivity.this,itemMsgString , Toast.LENGTH_SHORT)
-				.show();
-			} catch (JSONException e) {
-				Toast.makeText(BTControlActivity.this, "error reading item", Toast.LENGTH_SHORT)
-				.show();
-			}
-			
-			break;
-		
-			
-		
-		}
-		//those messages come from the remote bluetooth device, not from the BluetoothMiddleware
+//		LOG.out(this, b);
+//		BUNDLE_MESSAGE msg = BundleMessage.getInstance().getBundleMessageType(b);
+//		switch (msg){
+//		case NOT_A_BUNDLE_MESSAGE:
+//			Toast.makeText(BTControlActivity.this, "unknown action", Toast.LENGTH_SHORT)
+//			.show();
+//				for (String key : b.keySet()) {
+//					LOG.out(key, b.get(key));
+//				}
+//				
+//				Toast.makeText(BTControlActivity.this, b.toString(), Toast.LENGTH_SHORT)
+//						.show();
+//			break;
+//			
+//		case ITEM_FOUND:
+//		case ITEM_NOT_FOUND:
+//			
+//			Item i;
+//			try {
+//				i = BundleMessage.getInstance().toItemFound(b);
+//				String itemMsgString = "item found: "+i.getName();
+//				if (msg == BUNDLE_MESSAGE.ITEM_NOT_FOUND){
+//					itemMsgString = "unknown tag: "+i.getIds().get(0);
+//				}
+//				Toast.makeText(BTControlActivity.this,itemMsgString , Toast.LENGTH_SHORT)
+//				.show();
+//			} catch (JSONException e) {
+//				Toast.makeText(BTControlActivity.this, "error reading item", Toast.LENGTH_SHORT)
+//				.show();
+//			}
+//			
+//			break;
+//		
+//			
+//		
+//		}
+//		//those messages come from the remote bluetooth device, not from the BluetoothMiddleware
 		
 	}
 	@Override
